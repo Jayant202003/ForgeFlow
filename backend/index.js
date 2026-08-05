@@ -2,6 +2,9 @@ const dns = require("dns");
 
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
+
+const path = require("path");
+const fs = require("fs");
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -75,7 +78,22 @@ function startServer() {
   const port = process.env.PORT || 3000;
 
   app.use(bodyParser.json());
-  app.use(express.json());
+app.use(express.json());
+
+app.use(cors({ origin: "*" }));
+
+app.use("/", mainRouter);
+
+// Serve React frontend in production
+const frontendPath = path.join(__dirname, "../frontend/dist");
+
+if (fs.existsSync(frontendPath)) {
+  app.use(express.static(frontendPath));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(frontendPath, "index.html"));
+  });
+}
 
   const mongoURI = process.env.MONGODB_URI;
 

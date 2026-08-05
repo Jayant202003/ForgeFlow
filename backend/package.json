@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Backend API for ForgeFlow - A Git-inspired developer collaboration platform.",
   "main": "index.js",
-  "scripts": {
-    "start": "node index.js start",
-    "dev": "node index.js start"
-  },
+ "scripts": {
+  "start": "node index.js start",
+  "build": "cd ../frontend && npm install && npm run build"
+},
   "keywords": [
     "forgeflow",
     "nodejs",

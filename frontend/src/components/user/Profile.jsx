@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL from "../../config/api";
 import { Link } from "react-router-dom";
 import Navbar from "../Navbar";
 import "./profile.css";
@@ -22,7 +23,7 @@ const Profile = () => {
   const fetchProfile = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:3002/userProfile/${userId}`
+        `${API_BASE_URL}/userProfile/${userId}`
       );
 
       setUser(res.data);
@@ -34,7 +35,7 @@ const Profile = () => {
   const fetchRepositories = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:3002/repo/user/${userId}`
+        `${API_BASE_URL}/repo/user/${userId}`
       );
 
       setRepositories(res.data.repositories || []);

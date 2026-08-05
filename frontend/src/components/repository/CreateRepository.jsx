@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import API_BASE_URL from "../../config/api";
 import { useNavigate, useParams } from "react-router-dom";
 import "./createRepository.css";
 
@@ -22,7 +23,7 @@ const CreateRepository = () => {
     const fetchRepository = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3002/repo/${id}`
+          `${API_BASE_URL}/repo/${id}`
         );
 
         setName(res.data.name);
@@ -49,7 +50,7 @@ const CreateRepository = () => {
 
       if (isEdit) {
         await axios.put(
-          `http://localhost:3002/repo/update/${id}`,
+          `${API_BASE_URL}/repo/update/${id}`,
           {
             name,
             description,
@@ -60,7 +61,7 @@ const CreateRepository = () => {
         alert("Repository updated successfully!");
       } else {
         await axios.post(
-          "http://localhost:3002/repo/create",
+          "${API_BASE_URL}/repo/create",
           {
             owner,
             name,

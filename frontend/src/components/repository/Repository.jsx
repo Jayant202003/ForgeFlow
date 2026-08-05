@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL from "../../config/api";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "../Navbar";
 import "./repository.css";
@@ -28,7 +29,7 @@ const Repository = () => {
   const fetchRepository = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:3002/repo/${id}`
+        `${API_BASE_URL}/repo/${id}`
       );
 
       setRepo(res.data);
@@ -51,7 +52,7 @@ const Repository = () => {
   const fetchStarStatus = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:3002/repo/star/${id}/${userId}`
+        `${API_BASE_URL}/repo/star/${id}/${userId}`
       );
 
       setStarred(res.data.starred);
@@ -64,7 +65,7 @@ const Repository = () => {
   const toggleStar = async () => {
     try {
       const res = await axios.patch(
-        `http://localhost:3002/repo/star/${id}`,
+        `${API_BASE_URL}/repo/star/${id}`,
         {
           userId,
         }
@@ -81,7 +82,7 @@ const Repository = () => {
 
     try {
       await axios.post(
-        `http://localhost:3002/repo/${id}/file`,
+        `${API_BASE_URL}/repo/${id}/file`,
         {
           name: fileName,
           content: fileContent,
@@ -102,7 +103,7 @@ const Repository = () => {
 
     try {
       await axios.put(
-        `http://localhost:3002/repo/${id}/file/${selectedFile._id}`,
+        `${API_BASE_URL}/repo/${id}/file/${selectedFile._id}`,
         {
           content: editedContent,
         }
@@ -123,7 +124,7 @@ const Repository = () => {
 
     try {
       await axios.delete(
-        `http://localhost:3002/repo/${id}/file/${selectedFile._id}`
+        `${API_BASE_URL}/repo/${id}/file/${selectedFile._id}`
       );
 
       setSelectedFile(null);

@@ -3,6 +3,7 @@ import "./dashboard.css";
 import Navbar from "../Navbar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../../config/api";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -17,9 +18,7 @@ const Dashboard = () => {
 
     const fetchRepositories = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3002/repo/user/${userId}`
-        );
+        const response = await fetch(`${API_BASE_URL}/repo/user/${userId}`);
 
         const data = await response.json();
         setRepositories(data.repositories || []);
@@ -30,7 +29,7 @@ const Dashboard = () => {
 
     const fetchSuggestedRepositories = async () => {
       try {
-        const response = await fetch("http://localhost:3002/repo/all");
+        const response = await fetch(`${API_BASE_URL}/repo/all`);
         const data = await response.json();
 
         setSuggestedRepositories(data || []);

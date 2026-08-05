@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL from "../../config/api";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "../Navbar";
 import "./IssuePage.css";
@@ -24,7 +25,7 @@ const IssuePage = () => {
   const fetchRepository = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:3002/repo/${id}`
+        `${API_BASE_URL}/repo/${id}`
       );
 
       setRepo(res.data);
@@ -36,7 +37,7 @@ const IssuePage = () => {
   const fetchIssues = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:3002/issue/all/${id}`
+        `${API_BASE_URL}/issue/all/${id}`
       );
 
       setIssues(res.data);
@@ -53,7 +54,7 @@ const IssuePage = () => {
 
     try {
       await axios.post(
-        `http://localhost:3002/issue/create/${id}`,
+        `${API_BASE_URL}/issue/create/${id}`,
         {
           title,
           description,
@@ -72,7 +73,7 @@ const IssuePage = () => {
   const updateIssue = async (issue) => {
     try {
       await axios.put(
-        `http://localhost:3002/issue/update/${issue._id}`,
+        `${API_BASE_URL}/issue/update/${issue._id}`,
         {
           title: issue.title,
           description: issue.description,
@@ -94,7 +95,7 @@ const IssuePage = () => {
 
     try {
       await axios.delete(
-        `http://localhost:3002/issue/delete/${issueId}`
+        `${API_BASE_URL}/issue/delete/${issueId}`
       );
 
       loadData();
