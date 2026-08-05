@@ -27,13 +27,13 @@ const Login = () => {
     try {
       setLoading(true);
 
-      const res = await axios.post(
-        `${API_BASE_URL}/login",
-        {
-          email,
-          password,
-        }
-      );
+    const res = await axios.post(
+  `${API_BASE_URL}/login`,
+  {
+    email,
+    password,
+  }
+);
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.userId);
