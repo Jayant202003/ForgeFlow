@@ -9,8 +9,5 @@ mainRouter.use(userRouter);
 mainRouter.use(repoRouter);
 mainRouter.use(issueRouter);
 
-mainRouter.get("/", (req, res) => {
-  res.send("Welcome!");
-});
 
 module.exports = mainRouter;
