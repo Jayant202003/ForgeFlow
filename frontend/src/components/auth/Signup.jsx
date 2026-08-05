@@ -23,7 +23,7 @@ const Signup = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post("${API_BASE_URL}/signup", {
+      const res = await axios.post(`${API_BASE_URL}/signup`, {
         email: email,
         password: password,
         username: username,

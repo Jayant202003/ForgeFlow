@@ -61,7 +61,7 @@ const CreateRepository = () => {
         alert("Repository updated successfully!");
       } else {
         await axios.post(
-          "${API_BASE_URL}/repo/create",
+          `${API_BASE_URL}/repo/create",
           {
             owner,
             name,

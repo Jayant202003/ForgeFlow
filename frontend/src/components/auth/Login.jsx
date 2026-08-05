@@ -28,7 +28,7 @@ const Login = () => {
       setLoading(true);
 
       const res = await axios.post(
-        "${API_BASE_URL}/login",
+        `${API_BASE_URL}/login",
         {
           email,
           password,
