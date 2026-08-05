@@ -1,15 +1,25 @@
 {
-  "name": "frontend",
+  "name": "forgeflow-client",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "ForgeFlow Frontend - A modern Git-inspired developer collaboration platform.",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "test": "vitest",
     "build": "vite build",
+    "preview": "vite preview",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "test": "vitest"
   },
+  "keywords": [
+    "forgeflow",
+    "react",
+    "vite",
+    "github-clone",
+    "developer-platform"
+  ],
+  "author": "Jayant Shivankar",
+  "license": "MIT",
   "dependencies": {
     "@babel/plugin-syntax-jsx": "^7.24.7",
     "@primer/css": "^21.3.6",
@@ -35,8 +45,6 @@
     "eslint-plugin-react": "^7.34.3",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
-    "install": "^0.13.0",
-    "npm": "^10.8.2",
     "vite": "^5.3.4",
     "vitest": "^2.0.5"
   }

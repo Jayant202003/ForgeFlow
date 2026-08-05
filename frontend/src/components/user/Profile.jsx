@@ -1,104 +1,177 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./profile.css";
+import { Link } from "react-router-dom";
 import Navbar from "../Navbar";
-import { UnderlineNav } from "@primer/react";
-import { BookIcon, RepoIcon } from "@primer/octicons-react";
+import "./profile.css";
 import HeatMapProfile from "./HeatMap";
 import { useAuth } from "../../authContext";
 
 const Profile = () => {
-  const navigate = useNavigate();
-  const [userDetails, setUserDetails] = useState({ username: "username" });
   const { setCurrentUser } = useAuth();
 
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      const userId = localStorage.getItem("userId");
+  const userId = localStorage.getItem("userId");
 
-      if (userId) {
-        try {
-          const response = await axios.get(
-            `http://localhost:3002/userProfile/${userId}`
-          );
-          setUserDetails(response.data);
-        } catch (err) {
-          console.error("Cannot fetch user details: ", err);
-        }
-      }
-    };
-    fetchUserDetails();
+  const [user, setUser] = useState(null);
+  const [repositories, setRepositories] = useState([]);
+
+  useEffect(() => {
+    fetchProfile();
+    fetchRepositories();
   }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:3002/userProfile/${userId}`
+      );
+
+      setUser(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchRepositories = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:3002/repo/user/${userId}`
+      );
+
+      setRepositories(res.data.repositories || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    setCurrentUser(null);
+    window.location.href = "/auth";
+  };
+
+  if (!user) {
+    return (
+      <>
+        <Navbar />
+        <h2 style={{ padding: "40px", color: "white" }}>
+          Loading...
+        </h2>
+      </>
+    );
+  }
 
   return (
     <>
       <Navbar />
-      <UnderlineNav aria-label="Repository">
-        <UnderlineNav.Item
-          aria-current="page"
-          icon={BookIcon}
-          sx={{
-            backgroundColor: "transparent",
-            color: "white",
-            "&:hover": {
-              textDecoration: "underline",
-              color: "white",
-            },
-          }}
-        >
-          Overview
-        </UnderlineNav.Item>
 
-        <UnderlineNav.Item
-          onClick={() => navigate("/repo")}
-          icon={RepoIcon}
-          sx={{
-            backgroundColor: "transparent",
-            color: "whitesmoke",
-            "&:hover": {
-              textDecoration: "underline",
-              color: "white",
-            },
-          }}
-        >
-          Starred Repositories
-        </UnderlineNav.Item>
-      </UnderlineNav>
+      <div className="profile-container">
 
-      <button
-        onClick={() => {
-          localStorage.removeItem("token");
-          localStorage.removeItem("userId");
-          setCurrentUser(null);
+        <div className="profile-sidebar">
 
-          window.location.href = "/auth";
-        }}
-        style={{ position: "fixed", bottom: "50px", right: "50px" }}
-        id="logout"
-      >
-        Logout
-      </button>
-
-      <div className="profile-page-wrapper">
-        <div className="user-profile-section">
-          <div className="profile-image"></div>
-
-          <div className="name">
-            <h3>{userDetails.username}</h3>
+          <div className="avatar">
+            {user.username.charAt(0).toUpperCase()}
           </div>
 
-          <button className="follow-btn">Follow</button>
+          <h1>{user.username}</h1>
 
-          <div className="follower">
-            <p>10 Follower</p>
-            <p>3 Following</p>
+          <p>{user.email}</p>
+
+          <button
+            className="logout-btn"
+            onClick={logout}
+          >
+            Logout
+          </button>
+
+          <div className="stats">
+
+            <div className="stat-card">
+              <h2>{repositories.length}</h2>
+              <span>Repositories</span>
+            </div>
+
+            <div className="stat-card">
+              <h2>
+                {user.starRepos?.length || 0}
+              </h2>
+              <span>Stars</span>
+            </div>
+
+            <div className="stat-card">
+              <h2>
+                {user.followedUsers?.length || 0}
+              </h2>
+              <span>Following</span>
+            </div>
+
           </div>
+
         </div>
 
-        <div className="heat-map-section">
+        <div className="profile-content">
+
           <HeatMapProfile />
+
+          <h2 className="repo-heading">
+            Your Repositories
+          </h2>
+                    {repositories.length === 0 ? (
+            <div className="empty-repo">
+              <h3>No repositories yet.</h3>
+              <p>Create your first repository from the dashboard.</p>
+            </div>
+          ) : (
+            <div className="repo-grid">
+              {repositories.map((repo) => (
+                <Link
+                  key={repo._id}
+                  to={`/repo/${repo._id}`}
+                  className="repo-card"
+                >
+                  <div className="repo-card-top">
+                    <h3>{repo.name}</h3>
+
+                    <span
+                      className={
+                        repo.visibility
+                          ? "public-badge"
+                          : "private-badge"
+                      }
+                    >
+                      {repo.visibility ? "Public" : "Private"}
+                    </span>
+                  </div>
+
+                  <p className="repo-description">
+                    {repo.description ||
+                      "No description provided."}
+                  </p>
+
+                  <div className="repo-footer">
+                    <span>
+                      📄 {repo.files?.length || 0} Files
+                    </span>
+
+                    <span>
+                      🐞 {repo.issues?.length || 0} Issues
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          <div className="heatmap-wrapper">
+            <h2 className="repo-heading">
+              Contribution Activity
+            </h2>
+
+            <HeatMapProfile />
+          </div>
+
         </div>
+
       </div>
     </>
   );

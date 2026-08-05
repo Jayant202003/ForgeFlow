@@ -1,0 +1,86 @@
+.create-repo-page {
+  min-height: calc(100vh - 72px);
+  background: #0d1117;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.create-repo-card {
+  width: 600px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 14px;
+  padding: 35px;
+  box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.create-repo-card h1 {
+  margin: 0;
+  color: white;
+  font-size: 30px;
+}
+
+.create-repo-card p {
+  margin-top: 10px;
+  margin-bottom: 30px;
+  color: #8b949e;
+}
+
+.create-repo-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+.create-repo-card label {
+  color: #c9d1d9;
+  margin-bottom: 8px;
+  margin-top: 18px;
+  font-weight: 600;
+}
+
+.create-repo-card input,
+.create-repo-card textarea,
+.create-repo-card select {
+  background: #0d1117;
+  color: white;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 15px;
+  outline: none;
+}
+
+.create-repo-card input:focus,
+.create-repo-card textarea:focus,
+.create-repo-card select:focus {
+  border-color: #58a6ff;
+}
+
+.create-repo-card textarea {
+  resize: vertical;
+}
+
+.create-repo-card button {
+  margin-top: 30px;
+  background: #238636;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.create-repo-card button:hover {
+  background: #2ea043;
+}
+
+.create-repo-card button:disabled {
+  background: #4b5563;
+  cursor: not-allowed;
+}

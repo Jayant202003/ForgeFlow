@@ -1,56 +1,72 @@
 import React, { useEffect } from "react";
-import {useNavigate, useRoutes} from 'react-router-dom'
+import { useNavigate, useRoutes } from "react-router-dom";
 
-// Pages List
 import Dashboard from "./components/dashboard/Dashboard";
 import Profile from "./components/user/Profile";
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
+import CreateRepository from "./components/repository/CreateRepository";
+import Repository from "./components/repository/Repository";
+import IssuePage from "./components/issues/IssuePage";
 
-// Auth Context
 import { useAuth } from "./authContext";
 
-const ProjectRoutes = ()=>{
-    const {currentUser, setCurrentUser} = useAuth();
-    const navigate = useNavigate();
+const ProjectRoutes = () => {
+  const { currentUser, setCurrentUser } = useAuth();
+  const navigate = useNavigate();
 
-    useEffect(()=>{
-        const userIdFromStorage = localStorage.getItem("userId");
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
 
-        if(userIdFromStorage && !currentUser){
-            setCurrentUser(userIdFromStorage);
-        }
+    if (userId && !currentUser) {
+      setCurrentUser(userId);
+    }
 
-        if(!userIdFromStorage && !["/auth", "/signup"].includes(window.location.pathname))
-        {
-            navigate("/auth");
-        }
+    const publicRoutes = ["/auth", "/signup"];
 
-        if(userIdFromStorage && window.location.pathname=='/auth'){
-            navigate("/");
-        }
-    }, [currentUser, navigate, setCurrentUser]);
+    if (!userId && !publicRoutes.includes(window.location.pathname)) {
+      navigate("/auth", { replace: true });
+    }
 
-    let element = useRoutes([
-        {
-            path:"/",
-            element:<Dashboard/>
-        },
-        {
-            path:"/auth",
-            element:<Login/>
-        },
-        {
-            path:"/signup",
-            element:<Signup/>
-        },
-        {
-            path:"/profile",
-            element:<Profile/>
-        }
-    ]);
+    if (userId && window.location.pathname === "/auth") {
+      navigate("/", { replace: true });
+    }
+  }, [currentUser, navigate, setCurrentUser]);
 
-    return element;
-}
+  return useRoutes([
+    {
+      path: "/",
+      element: <Dashboard />,
+    },
+    {
+      path: "/auth",
+      element: <Login />,
+    },
+    {
+      path: "/signup",
+      element: <Signup />,
+    },
+    {
+      path: "/profile",
+      element: <Profile />,
+    },
+    {
+      path: "/create",
+      element: <CreateRepository />,
+    },
+    {
+      path: "/edit/:id",
+      element: <CreateRepository />,
+    },
+    {
+      path: "/repo/:id",
+      element: <Repository />,
+    },
+    {
+      path: "/repo/:id/issues",
+      element: <IssuePage />,
+    },
+  ]);
+};
 
 export default ProjectRoutes;

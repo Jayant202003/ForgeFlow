@@ -1,34 +1,39 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 const dotenv = require("dotenv");
-var ObjectId = require("mongodb").ObjectId;
 
 dotenv.config();
+
 const uri = process.env.MONGODB_URI;
 
 let client;
 
 async function connectClient() {
   if (!client) {
-    client = new MongoClient(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    client = new MongoClient(uri);
     await client.connect();
+    console.log("✅ MongoDB Native Client Connected");
   }
 }
 
 async function signup(req, res) {
   const { username, password, email } = req.body;
+
   try {
     await connectClient();
-    const db = client.db("githubclone");
+
+    const db = client.db("forgeflow");
     const usersCollection = db.collection("users");
 
-    const user = await usersCollection.findOne({ username });
-    if (user) {
-      return res.status(400).json({ message: "User already exists!" });
+    const existingUser = await usersCollection.findOne({
+      $or: [{ username }, { email }],
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        message: "User already exists!",
+      });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -36,152 +41,208 @@ async function signup(req, res) {
 
     const newUser = {
       username,
-      password: hashedPassword,
       email,
+      password: hashedPassword,
       repositories: [],
       followedUsers: [],
       starRepos: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     const result = await usersCollection.insertOne(newUser);
 
     const token = jwt.sign(
-      { id: result.insertId },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "1h" }
+      {
+        id: result.insertedId.toString(),
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
     );
-    res.json({ token, userId: result.insertId });
+
+    res.status(201).json({
+      token,
+      userId: result.insertedId,
+      message: "Signup Successful!",
+    });
   } catch (err) {
-    console.error("Error during signup : ", err.message);
-    res.status(500).send("Server error");
+    console.error("Error during signup:", err);
+    res.status(500).json({
+      message: "Server Error",
+    });
   }
 }
 
 async function login(req, res) {
   const { email, password } = req.body;
+
   try {
     await connectClient();
-    const db = client.db("githubclone");
+
+    const db = client.db("forgeflow");
     const usersCollection = db.collection("users");
 
     const user = await usersCollection.findOne({ email });
+
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials!" });
+      return res.status(400).json({
+        message: "Invalid email or password",
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials!" });
+      return res.status(400).json({
+        message: "Invalid email or password",
+      });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1h",
+    const token = jwt.sign(
+      {
+        id: user._id.toString(),
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
+
+    res.status(200).json({
+      token,
+      userId: user._id,
+      message: "Login Successful!",
     });
-    res.json({ token, userId: user._id });
   } catch (err) {
-    console.error("Error during login : ", err.message);
-    res.status(500).send("Server error!");
+    console.error("Error during login:", err);
+    res.status(500).json({
+      message: "Server Error",
+    });
   }
 }
 
 async function getAllUsers(req, res) {
   try {
     await connectClient();
-    const db = client.db("githubclone");
+
+    const db = client.db("forgeflow");
     const usersCollection = db.collection("users");
 
     const users = await usersCollection.find({}).toArray();
+
     res.json(users);
   } catch (err) {
-    console.error("Error during fetching : ", err.message);
-    res.status(500).send("Server error!");
+    console.error("Error fetching users:", err);
+    res.status(500).json({
+      message: "Server Error",
+    });
   }
 }
 
 async function getUserProfile(req, res) {
-  const currentID = req.params.id;
-
   try {
     await connectClient();
-    const db = client.db("githubclone");
+
+    const db = client.db("forgeflow");
     const usersCollection = db.collection("users");
 
     const user = await usersCollection.findOne({
-      _id: new ObjectId(currentID),
+      _id: new ObjectId(req.params.id),
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found!" });
+      return res.status(404).json({
+        message: "User not found",
+      });
     }
 
-    res.send(user);
+    res.json(user);
   } catch (err) {
-    console.error("Error during fetching : ", err.message);
-    res.status(500).send("Server error!");
+    console.error("Error fetching profile:", err);
+    res.status(500).json({
+      message: "Server Error",
+    });
   }
 }
 
 async function updateUserProfile(req, res) {
-  const currentID = req.params.id;
-  const { email, password } = req.body;
-
   try {
     await connectClient();
-    const db = client.db("githubclone");
+
+    const db = client.db("forgeflow");
     const usersCollection = db.collection("users");
 
-    let updateFields = { email };
-    if (password) {
+    const updateData = {
+      email: req.body.email,
+      updatedAt: new Date(),
+    };
+
+    if (req.body.password) {
       const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      updateFields.password = hashedPassword;
+      updateData.password = await bcrypt.hash(req.body.password, salt);
     }
 
     const result = await usersCollection.findOneAndUpdate(
       {
-        _id: new ObjectId(currentID),
+        _id: new ObjectId(req.params.id),
       },
-      { $set: updateFields },
-      { returnDocument: "after" }
+      {
+        $set: updateData,
+      },
+      {
+        returnDocument: "after",
+      }
     );
-    if (!result.value) {
-      return res.status(404).json({ message: "User not found!" });
+
+    if (!result) {
+      return res.status(404).json({
+        message: "User not found",
+      });
     }
 
-    res.send(result.value);
+    res.json(result);
   } catch (err) {
-    console.error("Error during updating : ", err.message);
-    res.status(500).send("Server error!");
+    console.error("Error updating profile:", err);
+    res.status(500).json({
+      message: "Server Error",
+    });
   }
 }
 
 async function deleteUserProfile(req, res) {
-  const currentID = req.params.id;
-
   try {
     await connectClient();
-    const db = client.db("githubclone");
+
+    const db = client.db("forgeflow");
     const usersCollection = db.collection("users");
 
     const result = await usersCollection.deleteOne({
-      _id: new ObjectId(currentID),
+      _id: new ObjectId(req.params.id),
     });
 
-    if (result.deleteCount == 0) {
-      return res.status(404).json({ message: "User not found!" });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        message: "User not found",
+      });
     }
 
-    res.json({ message: "User Profile Deleted!" });
+    res.json({
+      message: "User deleted successfully",
+    });
   } catch (err) {
-    console.error("Error during updating : ", err.message);
-    res.status(500).send("Server error!");
+    console.error("Error deleting user:", err);
+    res.status(500).json({
+      message: "Server Error",
+    });
   }
 }
 
 module.exports = {
-  getAllUsers,
   signup,
   login,
+  getAllUsers,
   getUserProfile,
   updateUserProfile,
   deleteUserProfile,

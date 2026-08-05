@@ -1,14 +1,22 @@
 {
-  "name": "backend",
+  "name": "forgeflow-server",
   "version": "1.0.0",
-  "description": "Git Clone",
+  "description": "Backend API for ForgeFlow - A Git-inspired developer collaboration platform.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js start"
+    "start": "node index.js start",
+    "dev": "node index.js start"
   },
-  "keywords": [],
-  "author": "Apna College",
-  "license": "ISC",
+  "keywords": [
+    "forgeflow",
+    "nodejs",
+    "express",
+    "mongodb",
+    "jwt",
+    "developer-platform"
+  ],
+  "author": "Jayant Shivankar",
+  "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.1657.0",
     "bcryptjs": "^2.4.3",
@@ -20,7 +28,6 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.0",
-    "socket-io": "^1.0.0",
     "socket.io": "^4.7.5",
     "uuid": "^10.0.0",
     "yargs": "^17.7.2"
