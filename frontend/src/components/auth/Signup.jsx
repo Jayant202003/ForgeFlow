@@ -37,10 +37,18 @@ const Signup = () => {
 
       window.location.href = "/";
     } catch (err) {
-      console.error(err);
-      alert("Signup Failed!");
-      setLoading(false);
-    }
+  console.error(err);
+
+  console.log(err.response);
+
+  alert(
+    err.response?.data?.message ||
+    err.response?.data ||
+    err.message
+  );
+
+  setLoading(false);
+}
   };
 
   return (
