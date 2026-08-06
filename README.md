@@ -179,28 +179,6 @@ npm install
 
 ---
 
-## Environment Variables
-
-Create a `.env` file inside the backend folder.
-
-```env
-PORT=3002
-
-MONGODB_URI=your_mongodb_connection_string
-
-JWT_SECRET=your_secret_key
-
-AWS_ACCESS_KEY_ID=your_key
-
-AWS_SECRET_ACCESS_KEY=your_secret
-
-AWS_REGION=your_region
-
-AWS_BUCKET_NAME=your_bucket
-```
-
----
-
 ## Run Backend
 
 ```bash
